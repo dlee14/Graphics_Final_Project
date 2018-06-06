@@ -1,0 +1,9 @@
+frames 100
+basename gravity
+push
+move 250 250 0
+rotate x 360 spinX
+rotate y 360 spinY
+sphere 0 0 100 50
+vary spinX 0 99 0 1
+vary spinY 0 99 0 1
