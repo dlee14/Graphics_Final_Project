@@ -26,9 +26,12 @@ color get_lighting( double *normal, char *constants, double * view ) {
     int * a = calculate_ambient(reflect);
     int * d = calculate_diffuse(reflect, normal);
     int * s = calculate_specular(reflect, normal, view);
-    i.red = limit_color(a[RED] + d[RED] + s[RED]);
-    i.green = limit_color(a[GREEN] + d[GREEN] + s[GREEN]);
-    i.blue = limit_color(a[BLUE] + d[BLUE] + s[BLUE]);
+    i.red = a[RED] + d[RED] + s[RED];
+    i.green = a[GREEN] + d[GREEN] + s[GREEN];
+    i.blue = a[BLUE] + d[BLUE] + s[BLUE];
+    limit_color(i.red);
+    limit_color(i.green);
+    limit_color(i.blue);
   }
 
   //else, set up base light, which is the only thing needed
@@ -41,7 +44,7 @@ color get_lighting( double *normal, char *constants, double * view ) {
   return i;
 }
 
-int * calculate_ambient(SYMTAB * reflection) {
+int * calculate_ambient(SYMTAB * reflect) {
   extern double alight[3];
   int * al = malloc(3 * sizeof(double));
   //fetching entries from symtab!
@@ -67,7 +70,7 @@ int * calculate_diffuse(SYMTAB * reflect, double * normal) {
   int * dl = malloc(3 * sizeof(double));
   double dot;
 
-  for(i = 0l i < num_lights; i++){
+  for(i = 0; i < num_lights; i++){
     SYMTAB * li = lookup_symbol(light_names[i]);
     normalize(li->s.l->l);
     dot = dot_product(normal, li->s.l->l);
@@ -79,7 +82,7 @@ int * calculate_diffuse(SYMTAB * reflect, double * normal) {
   return dl;
 }
 
-int * calculate_specular(SYMTAB * reflection, double * normal, double * view) {
+int * calculate_specular(SYMTAB * reflect, double * normal, double * view) {
   //acessing setup values yet again
   extern int num_lights;
   extern char light_names[100][100];
@@ -93,7 +96,7 @@ int * calculate_specular(SYMTAB * reflection, double * normal, double * view) {
     SYMTAB * li = lookup_symbol(light_names[i]);
 
     normalize(li->s.l->l);
-    dot = 2 * dot_product(normal, light->s.l->l);
+    dot = 2 * dot_product(normal, li->s.l->l);
 
     n[0] = (normal[0] * dot) - li->s.l->l[0];
     n[1] = (normal[1] * dot) - li->s.l->l[1];
