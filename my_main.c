@@ -138,7 +138,7 @@ void light_pass(){
 
   //defaults O:
   num_lights = 0;
-  alight = NULL;
+  //alight = 0;
 
   int i;
   int a = 0;
@@ -221,6 +221,8 @@ void my_main() {
   double theta;
   double knob_value, xval, yval, zval;
 
+  double view[3];
+
   view[0] = 0;
   view[1] = 0;
   view[2] = 1;
@@ -251,6 +253,7 @@ void my_main() {
     }
   }
 
+  knob_value = 1.0;
     for (i=0;i<lastop;i++) {
       switch (op[i].opcode)
         {
@@ -260,8 +263,12 @@ void my_main() {
                     op[i].op.sphere.d[2],
                     op[i].op.sphere.r, step_3d);
           matrix_mult( peek(systems), tmp );
-          draw_polygons(tmp, t, zb, view, light, ambient,
-                        areflect, dreflect, sreflect);
+          if(op[i].op.sphere.constants != NULL) {
+            draw_polygons(tmp, t, zb, op[i].op.sphere.constants, view);
+          }
+          else {
+            draw_polygons(tmp, t, zb, NULL, view);
+          }
           tmp->lastcol = 0;
           break;
         case TORUS:
@@ -271,8 +278,12 @@ void my_main() {
                     op[i].op.torus.d[2],
                     op[i].op.torus.r0,op[i].op.torus.r1, step_3d);
           matrix_mult( peek(systems), tmp );
-          draw_polygons(tmp, t, zb, view, light, ambient,
-                        areflect, dreflect, sreflect);
+          if(op[i].op.torus.constants != NULL) {
+            draw_polygons(tmp, t, zb, op[i].op.torus.constants, view);
+          }
+          else {
+            draw_polygons(tmp, t, zb, NULL, view);
+          }
           tmp->lastcol = 0;
           break;
         case BOX:
@@ -282,8 +293,12 @@ void my_main() {
                   op[i].op.box.d1[0],op[i].op.box.d1[1],
                   op[i].op.box.d1[2]);
           matrix_mult( peek(systems), tmp );
-          draw_polygons(tmp, t, zb, view, light, ambient,
-                        areflect, dreflect, sreflect);
+          if(op[i].op.box.constants != NULL) {
+            draw_polygons(tmp, t, zb, op[i].op.box.constants, view);
+          }
+          else {
+            draw_polygons(tmp, t, zb, NULL, view);
+          }
           tmp->lastcol = 0;
           break;
         case LINE:
@@ -301,11 +316,8 @@ void my_main() {
           yval = op[i].op.move.d[1];
           zval = op[i].op.move.d[2];
          if (op[i].op.move.p != NULL){
-            knob = knobs[frame];
-            while(strcmp(knob->name, op[i].op.move.p->name) && knob != NULL){
-              knob = knob->next;
-            }
-            knob_value = knob->value;
+           SYMTAB *s = lookup_symbol(op[i].op.move.p->name);
+            knob_value = s->s.value;
             xval *= knob_value;
             yval *= knob_value;
             zval *= knob_value;
@@ -320,11 +332,8 @@ void my_main() {
           yval = op[i].op.scale.d[1];
           zval = op[i].op.scale.d[2];
           if (op[i].op.scale.p != NULL){
-            knob = knobs[frame];
-            while(strcmp(knob->name, op[i].op.scale.p->name) && knob != NULL){
-              knob = knob->next;
-            }
-            knob_value = knob->value;
+            SYMTAB *s = lookup_symbol(op[i].op.scale.p->name);
+             knob_value = s->s.value;
             xval *= knob_value;
             yval *= knob_value;
             zval *= knob_value;
@@ -339,11 +348,8 @@ void my_main() {
           theta = op[i].op.rotate.degrees;
           theta*= (M_PI / 180);
           if (op[i].op.rotate.p != NULL){
-            knob = knobs[frame];
-            while(strcmp(knob->name, op[i].op.rotate.p->name) && knob != NULL){
-              knob = knob->next;
-            }
-            knob_value = knob->value;
+            SYMTAB *s = lookup_symbol(op[i].op.rotate.p->name);
+             knob_value = s->s.value;
             theta *= knob_value;
          }
           if (op[i].op.rotate.axis == 0 )
@@ -371,18 +377,20 @@ void my_main() {
           break;
         } //end opcode switch
     }//end operation loop
-    if(num_frames > 1){
-          char gif_name[256];
-          sprintf(gif_name, "anim/%s%03d.png", name, frame);
-          printf("%s\n", gif_name);
-          save_extension(t, gif_name);
-          free_stack(systems);
-          systems = new_stack();
-          tmp->lastcol = 0;
-          clear_screen(t);
-          clear_zbuffer(zb);
-    }
-  }
+
+    char gif_name[256];
+    sprintf(gif_name, "anim/%s%03d", name, i);
+    save_extension(t, gif_name);
+
+    clear_zbuffer(zb);
+    clear_screen(t);
+
+    free_stack(systems);
+    systems = new_stack();
+
+    free(tmp);
+    tmp = new_matrix(4, 1000);
+
   if(num_frames > 1){
     make_animation(name);
   }

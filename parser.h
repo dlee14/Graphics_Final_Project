@@ -131,7 +131,7 @@ int num_frames;
 char name[128];
 
 //vars for light
-char light_names[100][100]
+char light_names[100][100];
 int num_lights;
 double alight[3];
 
