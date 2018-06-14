@@ -131,9 +131,9 @@ int num_frames;
 char name[128];
 
 //vars for light
-char light_names[10][50]
-int num lights;
-double ambient_light[3];
+char light_names[100][100]
+int num_lights;
+double alight[3];
 
 //light pass fxn loop
 void light_pass();

@@ -11,7 +11,8 @@
 color get_lighting( double *normal, char *constants, double * view ) {
   //initializations
   color i;
-  int a, d, s;
+  //jk cant do dis part
+  //int * a, d, s;
 
   normalize(normal);
   normalize(view);
@@ -19,76 +20,101 @@ color get_lighting( double *normal, char *constants, double * view ) {
   int loop = 0;
   if(constants != NULL) {loop = 1;}
 
+  //if entries exist
   if(loop){
     SYMTAB * reflect = lookup_symbol(constants);
-    a = calculate_ambient(reflect);
-    d = calculate_specular(reflect, normal);
-    s = calculate_specular(reflect, normal, view);
-    i.red = a.red + d.red + s.red;
-    i.green = a.green + d.green + s.green;
-    i.blue = a.blue + d.blue + s.blue;
+    int * a = calculate_ambient(reflect);
+    int * d = calculate_specular(reflect, normal);
+    int * s = calculate_specular(reflect, normal, view);
+    i.red = limit_color(a[RED] + d[RED] + s[RED]);
+    i.green = limit_color(a[GREEN] + d[GREEN] + s[GREEN]);
+    i.blue = limit_color(a[BLUE] + d[BLUE] + s[BLUE]);
   }
 
-  limit_color(&i);
+  //else, set up base light, which is the only thing needed
+  else{
+    extern double alight[3];
+    i.red = alight[RED];
+    i.green = alight[GREEN];
+    i.blue = alight[BLUE];
+  }
   return i;
 }
 
-color calculate_ambient(color ambient, double *constants ) {
-  color a;
+int * calculate_ambient(SYMTAB * reflection) {
+  extern double alight[3];
+  int * al = malloc(3 * sizeof(double));
+  //fetching entries from symtab!
+  al[RED] = alight[RED] * reflect->s.c->r[0];
+  al[GREEN] = alight[GREEN] * reflect->s.c->g[0];
+  al[BLUE] = alight[BLUE] * reflect->s.c->b[0];
+  return al;
+  /**
   a.red = ambient.red * constants[RED][0];
   a.green = ambient.green * constants[GREEN][0];
   a.blue = ambient.blue * constants[BLUE][0];
   return a;
+  **/
 }
 
-color calculate_diffuse(double light[2][3], double *constants, double *normal ) {
-  color d;
+int * calculate_diffuse(SYMTAB * reflect, double * normal) {
+  //acessing setup values
+  extern int num_lights;
+  extern char light_names[100][100];
+
+  int i;
+
+  int * dl = malloc(3 * sizeof(double));
   double dot;
-  double lvector[3];
 
-  lvector[0] = light[LOCATION][0];
-  lvector[1] = light[LOCATION][1];
-  lvector[2] = light[LOCATION][2];
-  normalize(lvector);
+  for(i = 0l i < num_lights; i++){
+    SYMTAB * li = lookup_symbol(light_names[i]);
+    normalize(li->s.l->l);
+    dot = dot_product(normal, li->s.l->l);
+    dl[RED] = dl[RED] + li->s.l->c[0] * reflect->s.c->r[1] * dot;
+    dl[GREEN] = dl[GREEN] + li->s.l->c[1] * reflect->s.c->g[1] * dot;
+    dl[BLUE] = dl[BLUE] + li->s.l->c[2] * reflect->s.c->b[1] * dot;
+  }
 
-  dot = dot_product(normal, lvector);
-
-
-
-  d.red = (int)(light[COLOR][RED] * dreflect[RED] * dot);
-  d.green = (int)(light[COLOR][GREEN] * dreflect[GREEN] * dot);
-  d.blue = (int)(light[COLOR][BLUE] * dreflect[BLUE] * dot);
-
-
-  return d;
+  return dl;
 }
 
-color calculate_specular(double light[2][3], double *sreflect, double *view, double *normal ) {
+int * calculate_specular(SYMTAB * reflection, double * normal, double * view) {
+  //acessing setup values yet again
+  extern int num_lights;
+  extern char light_names[100][100];
 
-  color s;
-  double lvector[3];
-  double result;
+  int * sl = malloc(3 * sizeof(double));
   double n[3];
+  double dot;
+  int i;
 
-  lvector[0] = light[LOCATION][0];
-  lvector[1] = light[LOCATION][1];
-  lvector[2] = light[LOCATION][2];
-  normalize(lvector);
+  for(i = 0; i < num_lights; i++){
+    SYMTAB * li = lookup_symbol(light_names[i]);
 
-  result = 2 * dot_product(normal, lvector);
-  n[0] = (normal[0] * result) - lvector[0];
-  n[1] = (normal[1] * result) - lvector[1];
-  n[2] = (normal[2] * result) - lvector[2];
+    normalize(li->s.l->l);
+    dot = 2 * dot_product(normal, light->s.l->l);
 
-  result = dot_product(n, view );
-  result = result > 0 ? result : 0;
-  result = pow( result, SPECULAR_EXP );
+    n[0] = (normal[0] * dot) - li->s.l->l[0];
+    n[1] = (normal[1] * dot) - li->s.l->l[1];
+    n[2] = (normal[2] * dot) - li->s.l->l[2];
 
-  s.red = (int)(light[COLOR][RED] * sreflect[RED] * result);
-  s.green = (int)(light[COLOR][GREEN] * sreflect[GREEN] * result);
-  s.blue = (int)(light[COLOR][BLUE] * sreflect[BLUE] * result);
+    //checking
+    dot = dot_product(n, view);
+    if(dot > 0){
+      pow(dot, SPECULAR_EXP);
+    }
+    else{
+      dot = 0;
+    }
 
-  return s;
+    sl[RED] = sl[RED] + li->s.l->c[RED] * reflect->s.c->r[2] * dot;
+    sl[GREEN] = sl[GREEN] + li->s.l->c[GREEN] * reflect->s.c->g[2] * dot;
+    sl[BLUE] = sl[BLUE] + li->s.l->c[BLUE] * reflect->s.c->b[2] * dot;
+
+  }
+
+  return sl;
 }
 
 
