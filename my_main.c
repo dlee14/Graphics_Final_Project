@@ -258,7 +258,7 @@ void my_main() {
                     op[i].op.sphere.r, step_3d);
           matrix_mult( peek(systems), tmp );
           if(op[i].op.sphere.constants != NULL) {
-            draw_polygons(tmp, t, zb, op[i].op.sphere.constants, view);
+            draw_polygons(tmp, t, zb, op[i].op.sphere.constants->name, view);
           }
           else {
             draw_polygons(tmp, t, zb, NULL, view);
@@ -273,7 +273,7 @@ void my_main() {
                     op[i].op.torus.r0,op[i].op.torus.r1, step_3d);
           matrix_mult( peek(systems), tmp );
           if(op[i].op.torus.constants != NULL) {
-            draw_polygons(tmp, t, zb, op[i].op.torus.constants, view);
+            draw_polygons(tmp, t, zb, op[i].op.torus.constants->name, view);
           }
           else {
             draw_polygons(tmp, t, zb, NULL, view);
@@ -288,7 +288,7 @@ void my_main() {
                   op[i].op.box.d1[2]);
           matrix_mult( peek(systems), tmp );
           if(op[i].op.box.constants != NULL) {
-            draw_polygons(tmp, t, zb, op[i].op.box.constants, view);
+            draw_polygons(tmp, t, zb, op[i].op.box.constants->name, view);
           }
           else {
             draw_polygons(tmp, t, zb, NULL, view);
