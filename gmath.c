@@ -26,12 +26,9 @@ color get_lighting( double *normal, char *constants, double * view ) {
     int * a = calculate_ambient(reflect);
     int * d = calculate_diffuse(reflect, normal);
     int * s = calculate_specular(reflect, normal, view);
-    i.red = a[RED] + d[RED] + s[RED];
-    i.green = a[GREEN] + d[GREEN] + s[GREEN];
-    i.blue = a[BLUE] + d[BLUE] + s[BLUE];
-    limit_color(i.red);
-    limit_color(i.green);
-    limit_color(i.blue);
+    i.red = limit_color(a[RED] + d[RED] + s[RED]);
+    i.green = limit_color(a[GREEN] + d[GREEN] + s[GREEN]);
+    i.blue = limit_color(a[BLUE] + d[BLUE] + s[BLUE]);
   }
 
   //else, set up base light, which is the only thing needed
@@ -122,14 +119,10 @@ int * calculate_specular(SYMTAB * reflect, double * normal, double * view) {
 
 
 //limit each component of c to a max of 255
-void limit_color( color * c ) {
-  c->red = c->red > 255 ? 255 : c->red;
-  c->green = c->green > 255 ? 255 : c->green;
-  c->blue = c->blue > 255 ? 255 : c->blue;
-
-  c->red = c->red < 0 ? 0 : c->red;
-  c->green = c->green < 0 ? 0 : c->green;
-  c->blue = c->blue < 0 ? 0 : c->blue;
+int limit_color( int x ) {
+  x = x > 255 ? 255 : x;
+  x = x < 0 ? 0 : x;
+  return x;
 }
 
 //vector functions

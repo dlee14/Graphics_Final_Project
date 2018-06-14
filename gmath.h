@@ -20,7 +20,7 @@ color get_lighting( double *normal, char *constants, double *view);
 int * calculate_ambient(SYMTAB * reflect);
 int * calculate_diffuse(SYMTAB * reflect, double * normal );
 int * calculate_specular(SYMTAB * reflect, double * normal, double * view);
-void limit_color( color * c );
+int limit_color( int x );
 
 //vector functions
 void normalize( double *vector );

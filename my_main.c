@@ -232,12 +232,6 @@ void my_main() {
   clear_screen( t );
   clear_zbuffer(zb);
 
-  struct stat st = {0};
-
-  if (stat("anim", &st) == -1) {
-        mkdir("anim", 0777);//create directory because imagemagick wont create a new directory based on name on my mac
-  }
-
   first_pass();
   struct vary_node ** knobs = second_pass();
 
@@ -352,6 +346,7 @@ void my_main() {
              knob_value = s->s.value;
             theta *= knob_value;
          }
+         theta *= (M_PI / 180);
           if (op[i].op.rotate.axis == 0 )
             tmp = make_rotX( theta );
           else if (op[i].op.rotate.axis == 1 )
@@ -368,9 +363,6 @@ void my_main() {
           break;
         case POP:
           pop(systems);
-          break;
-        case SAVE:
-          save_extension(t, op[i].op.save.p->name);
           break;
         case DISPLAY:
           display(t);
@@ -391,7 +383,7 @@ void my_main() {
     free(tmp);
     tmp = new_matrix(4, 1000);
 
-  if(num_frames > 1){
+  if(num_frames > 0){
     make_animation(name);
   }
 }
