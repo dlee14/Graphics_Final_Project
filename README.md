@@ -15,6 +15,4 @@
   ```
   constants <name> <kar> <kdr> <ksr> <kag> <kdg> <ksg> <kab> <kdb> <ksb>
   ```
-   ka - ambient constant
-   kd - diffuse constant
-   ks - specular constant
+   ka - ambient constant, kd - diffuse constant, ks - specular constant
