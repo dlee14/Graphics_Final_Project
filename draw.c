@@ -146,11 +146,7 @@ void add_polygon( struct matrix *polygons,
   lines connecting each points to create bounding
   triangles
   ====================*/
-void draw_polygons(struct matrix *polygons, screen s, zbuffer zb,
-                   double *view, double light[2][3], color ambient,
-                   double *areflect,
-                   double *dreflect,
-                   double *sreflect) {
+void draw_polygons(struct matrix *polygons, screen s, zbuffer zb, char *constants, double * view) {
   if ( polygons->lastcol < 3 ) {
     printf("Need at least 3 points to draw a polygon!\n");
     return;
@@ -164,33 +160,10 @@ void draw_polygons(struct matrix *polygons, screen s, zbuffer zb,
     normal = calculate_normal(polygons, point);
 
     if ( dot_product(normal, view) > 0 ) {
-
-      color c = get_lighting(normal, view, ambient, light, areflect, dreflect, sreflect);
-
+      color c = get_lighting(normal, constants, view);
       scanline_convert(polygons, point, s, zb, c);
-
-      draw_line( polygons->m[0][point],
-                 polygons->m[1][point],
-                 polygons->m[2][point],
-                 polygons->m[0][point+1],
-                 polygons->m[1][point+1],
-                 polygons->m[2][point+1],
-                 s, zb, c);
-      draw_line( polygons->m[0][point+2],
-                 polygons->m[1][point+2],
-                 polygons->m[2][point+2],
-                 polygons->m[0][point+1],
-                 polygons->m[1][point+1],
-                 polygons->m[2][point+1],
-                 s, zb, c);
-      draw_line( polygons->m[0][point],
-                 polygons->m[1][point],
-                 polygons->m[2][point],
-                 polygons->m[0][point+2],
-                 polygons->m[1][point+2],
-                 polygons->m[2][point+2],
-                 s, zb, c);
     }
+    free(normal);
   }
 }
 
