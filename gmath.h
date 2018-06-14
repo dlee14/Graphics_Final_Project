@@ -17,9 +17,9 @@
 
 //lighting functions
 color get_lighting( double *normal, char *constants, double *view);
-color calculate_ambient(SYMTAB * reflect);
-color calculate_diffuse(SYMTAB * reflect, double * normal );
-color calculate_specular(SYMTAB * reflect, double * normal, double * view);
+int * calculate_ambient(SYMTAB * reflect);
+int * calculate_diffuse(SYMTAB * reflect, double * normal );
+int * calculate_specular(SYMTAB * reflect, double * normal, double * view);
 void limit_color( color * c );
 
 //vector functions

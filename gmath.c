@@ -24,7 +24,7 @@ color get_lighting( double *normal, char *constants, double * view ) {
   if(loop){
     SYMTAB * reflect = lookup_symbol(constants);
     int * a = calculate_ambient(reflect);
-    int * d = calculate_specular(reflect, normal);
+    int * d = calculate_diffuse(reflect, normal);
     int * s = calculate_specular(reflect, normal, view);
     i.red = limit_color(a[RED] + d[RED] + s[RED]);
     i.green = limit_color(a[GREEN] + d[GREEN] + s[GREEN]);
