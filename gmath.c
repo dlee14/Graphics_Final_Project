@@ -29,6 +29,9 @@ color get_lighting( double *normal, char *constants, double * view ) {
     i.red = limit_color(a[RED] + d[RED] + s[RED]);
     i.green = limit_color(a[GREEN] + d[GREEN] + s[GREEN]);
     i.blue = limit_color(a[BLUE] + d[BLUE] + s[BLUE]);
+    free(a);
+    free(d);
+    free(s);
   }
 
   //else, set up base light, which is the only thing needed
@@ -43,7 +46,7 @@ color get_lighting( double *normal, char *constants, double * view ) {
 
 int * calculate_ambient(SYMTAB * reflect) {
   extern double alight[3];
-  int * al = malloc(3 * sizeof(double));
+  int * al = (int*)malloc(3 * sizeof(double));
   //fetching entries from symtab!
   al[RED] = alight[RED] * reflect->s.c->r[0];
   al[GREEN] = alight[GREEN] * reflect->s.c->g[0];
@@ -63,8 +66,7 @@ int * calculate_diffuse(SYMTAB * reflect, double * normal) {
   extern char light_names[100][100];
 
   int i;
-
-  int * dl = malloc(3 * sizeof(double));
+  int * dl = (int*)calloc(3, sizeof(double));
   double dot;
 
   for(i = 0; i < num_lights; i++){
@@ -84,7 +86,7 @@ int * calculate_specular(SYMTAB * reflect, double * normal, double * view) {
   extern int num_lights;
   extern char light_names[100][100];
 
-  int * sl = malloc(3 * sizeof(double));
+  int * sl = (int*)calloc(3, sizeof(double));
   double n[3];
   double dot;
   int i;
@@ -102,7 +104,7 @@ int * calculate_specular(SYMTAB * reflect, double * normal, double * view) {
     //checking
     dot = dot_product(n, view);
     if(dot > 0){
-      pow(dot, SPECULAR_EXP);
+      dot = pow(dot, SPECULAR_EXP);
     }
     else{
       dot = 0;
