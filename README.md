@@ -17,6 +17,6 @@
   ```
    ka - ambient constant, kd - diffuse constant, ks - specular constant
 
-# Bugs
+# Bugs:
 * The multiple lighting is not functional.
 * Instead of making multiple images, the program only produces one black image of the first frame.
