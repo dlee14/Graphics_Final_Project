@@ -7,33 +7,41 @@
 #include "ml6.h"
 
 //lighting functions
-color get_lighting( double *normal, double *view, color alight, double light[2][3], double *areflect, double *dreflect, double *sreflect) {
+//contsants can simply be chars (small space needed)
+color get_lighting( double *normal, char *constants, double * view ) {
+  //initializations
+  color i;
+  int a, d, s;
 
-  color a, d, s, i;
   normalize(normal);
+  normalize(view);
 
-  a = calculate_ambient( alight, areflect );
-  d = calculate_diffuse( light, dreflect, normal );
-  s = calculate_specular( light, sreflect, view, normal );
+  int loop = 0;
+  if(constants != NULL) {loop = 1;}
 
-  i.red = a.red + d.red + s.red;
-  i.green = a.green + d.green + s.green;
-  i.blue = a.blue + d.blue + s.blue;
+  if(loop){
+    SYMTAB * reflect = lookup_symbol(constants);
+    a = calculate_ambient(reflect);
+    d = calculate_specular(reflect, normal);
+    s = calculate_specular(reflect, normal, view);
+    i.red = a.red + d.red + s.red;
+    i.green = a.green + d.green + s.green;
+    i.blue = a.blue + d.blue + s.blue;
+  }
 
   limit_color(&i);
   return i;
 }
 
-color calculate_ambient(color alight, double *areflect ) {
+color calculate_ambient(color ambient, double *constants ) {
   color a;
-  a.red = alight.red * areflect[RED];
-  a.green = alight.green * areflect[GREEN];
-  a.blue = alight.blue * areflect[BLUE];
-
+  a.red = ambient.red * constants[RED][0];
+  a.green = ambient.green * constants[GREEN][0];
+  a.blue = ambient.blue * constants[BLUE][0];
   return a;
 }
 
-color calculate_diffuse(double light[2][3], double *dreflect, double *normal ) {
+color calculate_diffuse(double light[2][3], double *constants, double *normal ) {
   color d;
   double dot;
   double lvector[3];
@@ -45,9 +53,12 @@ color calculate_diffuse(double light[2][3], double *dreflect, double *normal ) {
 
   dot = dot_product(normal, lvector);
 
+
+
   d.red = (int)(light[COLOR][RED] * dreflect[RED] * dot);
   d.green = (int)(light[COLOR][GREEN] * dreflect[GREEN] * dot);
   d.blue = (int)(light[COLOR][BLUE] * dreflect[BLUE] * dot);
+
 
   return d;
 }

@@ -70,7 +70,7 @@ struct command
     struct {
       SYMTAB *constants;
       char name[255];
-      SYMTAB *cs; 
+      SYMTAB *cs;
     } mesh;
     struct {
       SYMTAB *p;
@@ -116,7 +116,7 @@ struct command
     struct {
       double value;
     } setknobs;
-    struct { 
+    struct {
       double value;
     } focal;
   } op;
@@ -130,8 +130,16 @@ extern struct command op[MAX_COMMANDS];
 int num_frames;
 char name[128];
 
+//vars for light
+char light_names[10][50]
+int num lights;
+double ambient_light[3];
+
+//light pass fxn loop
+void light_pass();
+
 struct vary_node {
-  
+
   char name[128];
   double value;
   struct vary_node *next;
@@ -145,8 +153,3 @@ struct vary_node ** second_pass();
 void print_pcode();
 void my_main();
 #endif
-
-
-
-
-
