@@ -122,6 +122,45 @@ struct vary_node ** second_pass() {
   }
   return list;
 }
+/*======== void light_pass() ==========
+  Inputs:
+  Returns:
+  This fxn runs through the operations and adds light values
+  when appropriate. Also accounts for ambient values only.
+  This is due to the fact that an image with only
+  ambient light is sufficient.
+  ====================*/
+void light_pass(){
+  //acessing again woohoo
+  extern char light_names[100][100];
+  extern double alight[3];
+  extern int num_lights;
+
+  //defaults O:
+  num_lights = 0;
+  alight = NULL;
+
+  int i;
+  int a = 0;
+
+  for(i = 0; i < lastop; i++){
+    if(op[i].opcode == LIGHT){
+      strncpy(light_names[num_lights], op[i].op.light.p->name, sizeof(light_names[num_lights]));
+      num_lights++;
+    }
+    else if(op[i].opcode == AMBIENT){
+      alight[0] = op[i].op.ambient.c[0];
+      alight[1] = op[i].op.ambient.c[1];
+      alight[2] = op[i].op.ambient.c[2];
+      a = 1;
+    }
+  }
+  if(!a){
+    alight[0] = 255;
+    alight[1] = 255;
+    alight[2] = 255;
+  }
+}
 
 /*======== void print_knobs() ==========
 Inputs:
