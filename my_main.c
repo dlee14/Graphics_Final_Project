@@ -221,41 +221,9 @@ void my_main() {
   double theta;
   double knob_value, xval, yval, zval;
 
-  //Lighting values here for easy access
-  color ambient;
-  double light[2][3];
-  double view[3];
-  double areflect[3];
-  double dreflect[3];
-  double sreflect[3];
-
-  ambient.red = 50;
-  ambient.green = 50;
-  ambient.blue = 50;
-
-  light[LOCATION][0] = 0.5;
-  light[LOCATION][1] = 0.75;
-  light[LOCATION][2] = 1;
-
-  light[COLOR][RED] = 0;
-  light[COLOR][GREEN] = 255;
-  light[COLOR][BLUE] = 255;
-
   view[0] = 0;
   view[1] = 0;
   view[2] = 1;
-
-  areflect[RED] = 0.1;
-  areflect[GREEN] = 0.1;
-  areflect[BLUE] = 0.1;
-
-  dreflect[RED] = 0.5;
-  dreflect[GREEN] = 0.5;
-  dreflect[BLUE] = 0.5;
-
-  sreflect[RED] = 0.5;
-  sreflect[GREEN] = 0.5;
-  sreflect[BLUE] = 0.5;
 
   systems = new_stack();
   tmp = new_matrix(4, 1000);
@@ -270,14 +238,18 @@ void my_main() {
 
   first_pass();
   struct vary_node ** knobs = second_pass();
-  int frame;
-  struct vary_node * knob;
-  for(frame = 0; frame<num_frames; frame++){
-    knob = knobs[frame];
-    while(knob != NULL){
-      set_value(lookup_symbol(knob->name), knob->value);
-      knob = knob->next;
+
+  //No more hardcoded values; symtab CREATING
+  int j;
+  for(j = 0; j < num_frames; j++){
+    SYMTAB * s;
+    struct vary_node * node = knobs[j];
+
+    while(node != NULL){
+      set_value(lookup_symbol(node->name), node->value);
+      node = node->next;
     }
+  }
 
     for (i=0;i<lastop;i++) {
       switch (op[i].opcode)
